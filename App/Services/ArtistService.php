@@ -30,11 +30,12 @@ class ArtistService
             $client = new Client();
             //  Obtengo Spotify ID a partir del parametro recibido
             if($params['q']){
+                $headers = self::getHeaders();
                 $artist = $params['q'];
                 $artist = $client->get(
                                         'https://api.spotify.com/v1/search', 
                                         [
-                                            'headers' => self::getHeaders(), 
+                                            'headers' => $headers, 
                                             'query' => [
                                                 'type' => 'artist', 
                                                 'q' => $artist
@@ -48,7 +49,7 @@ class ArtistService
                     $albums = $client->get(
                                             'https://api.spotify.com/v1/artists/'. $spotifyId .'/albums',
                                             [
-                                                'headers' => self::getHeaders(),
+                                                'headers' => $headers,
                                                 'query' => [
                                                     'include_groups' => 'album'
                                                 ]
@@ -87,7 +88,8 @@ class ArtistService
      * Token temporal provisto por Spotify
      */
     private static function getSpotifyToken(){
-        return $_ENV['SPOTIFY_TOKEN'];    
+        $clientCredentials = self::getAuthToken();
+        return $clientCredentials['access_token'];  
     }
 
     /**
@@ -95,9 +97,25 @@ class ArtistService
      */
     private static function getHeaders(){
         return [
-            "Accept" => "application/json",
-            "Content-Type" => "application/json",
+            "Content-Type" => "application/x-www-form-urlencoded",
             "Authorization" => "Bearer " . self::getSpotifyToken()
         ];
+    }
+
+    private static function getAuthToken(){
+        $credentials = base64_encode($_ENV['SPOTIFY_CLIENT_ID'].':'.$_ENV['SPOTIFY_CLIENT_SECRET']);
+        $client = new Client();
+        $clientCredentials = $client->post(
+            'https://accounts.spotify.com/api/token', 
+            [
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'Basic ' . $credentials
+                ], 
+                'form_params' => [
+                    'grant_type' => 'client_credentials'
+                    ]
+            ]);
+        return json_decode($clientCredentials->getBody(), true);
     }
 }   
