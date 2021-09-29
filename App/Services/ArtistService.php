@@ -2,22 +2,27 @@
 namespace App\Services;
 
 use DateTime;
+use Dotenv\Dotenv;
 use Exception;
 use GuzzleHttp\Client;
 use Slim\Http\Request;
 use Slim\Http\Response;
+
+require('../../vendor/autoload.php');
 
 class ArtistService
 {
 
     public function __construct()
     {
+        $dotenv = Dotenv::createImmutable('../../');
+        $dotenv->load();
     }
 
     /**
      * Obtiene los data sobre los albums de un artista recibido por parametro.
      */
-    public static function getAlbumsByArtist(Request $request, Response $response) : Response{
+    public static function getAlbumsByArtist(Request $request, Response $response){
         $responseData = [];
         try{
             $params = $request->getQueryParams();
@@ -63,7 +68,7 @@ class ArtistService
                 }
             }else{
                 return $response
-                        ->withStatus(201)
+                        ->withStatus(400)
                         ->getBody()
                         ->write('Missing query param');
             }
@@ -82,8 +87,7 @@ class ArtistService
      * Token temporal provisto por Spotify
      */
     private static function getSpotifyToken(){
-        return 'BQCCH6W0t2bNjr2fDN5TqUgisH0dYtkWUC5RgeXAvjl5sz0e05lTieEd4rM14ephvDDFSxoCiapXo_7yICwOSIVtkJ8iHhohAEw_T2GIuis4bCSuw5ni48YMm2lNoISwZpYgPS_oyLrbTrEoQZQ';
-    }
+        return $_ENV['SPOTIFY_TOKEN'];    }
 
     /**
      * Headers para el correcto armado del request de API SPOTIFY

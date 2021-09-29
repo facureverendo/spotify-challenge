@@ -11,7 +11,8 @@ require '../../App/Services/ArtistService.php';
 $app = new \Slim\App;
 
 $app->get('/albums', function (Request $request, Response $response) {
-    return ArtistService::getAlbumsByArtist($request, $response);
+    $artistService  = new ArtistService();
+    return $artistService->getAlbumsByArtist($request, $response);
 });
 
 $app->run();
