@@ -87,7 +87,8 @@ class ArtistService
      * Token temporal provisto por Spotify
      */
     private static function getSpotifyToken(){
-        return $_ENV['SPOTIFY_TOKEN'];    }
+        return $_ENV['SPOTIFY_TOKEN'];    
+    }
 
     /**
      * Headers para el correcto armado del request de API SPOTIFY
